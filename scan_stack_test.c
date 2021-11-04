@@ -64,7 +64,8 @@ uint32_t return_value(void) {
 }
 
 uint32_t check_return_value(void) {
-  assert(find_in_stack(8, rb_wasm_get_stack_pointer(), base_stack_pointer) && "missing returned variable");
+  // Note: This can be covered by asyncify approach
+  // assert(find_in_stack(8, rb_wasm_get_stack_pointer(), base_stack_pointer) && "missing returned variable");
   return 0;
 }
 

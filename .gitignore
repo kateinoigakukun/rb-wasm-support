@@ -1,3 +1,4 @@
 /tools
 *.o
 *_test
+*_test.asyncified
