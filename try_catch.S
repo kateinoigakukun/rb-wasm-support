@@ -55,6 +55,28 @@ rb_wasm_try2:
 	.size	rb_wasm_try2, .Lrb_wasm_try2_end1-rb_wasm_try2
 # ========= END OF rb_wasm_try2 FUNCTION ==============
 
+# ========= START OF rb_wasm_try3 FUNCTION ==============
+	.section	.text.rb_wasm_try3,"",@
+	.globl	rb_wasm_try3
+	.type	rb_wasm_try3,@function
+rb_wasm_try3:
+	.functype	rb_wasm_try3 (i32, i32, i32, i32, i32) -> (i32)
+	try
+	  local.get 1 # i32 arg0
+	  local.get 2 # i32 arg1
+	  local.get 3 # i32 arg2
+	  local.get 4 # i32 arg3
+	  local.get 0 # callee function ptr
+	  call_indirect (i32, i32, i32, i32) -> ()
+	catch	__ruby_setjmp
+	  return
+	end_try
+	i32.const 0
+	end_function
+.Lrb_wasm_try3_end1:
+	.size	rb_wasm_try3, .Lrb_wasm_try3_end1-rb_wasm_try3
+# ========= END OF rb_wasm_try3 FUNCTION ==============
+
 # ========= START OF rb_wasm_try_retry_catch FUNCTION ==============
 	.section	.text.rb_wasm_try_retry_catch,"",@
 	.globl	rb_wasm_try_retry_catch
