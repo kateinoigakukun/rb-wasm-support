@@ -54,6 +54,23 @@ void new_frame(uint32_t arg) {
   }
 }
 
+void check_intermediate_value(uint32_t a) {
+  a++;
+  assert(find_in_stack(7, rb_wasm_get_stack_pointer(), base_stack_pointer) && "missing local variable");
+}
+
+uint32_t return_value(void) {
+  return 8;
+}
+
+uint32_t check_return_value(void) {
+  assert(find_in_stack(8, rb_wasm_get_stack_pointer(), base_stack_pointer) && "missing returned variable");
+  return 0;
+}
+
+void take_two_args(uint32_t a, uint32_t b) {
+}
+
 int main(void) {
   uint32_t deadbeef;
   register uint32_t facefeed;
@@ -61,6 +78,9 @@ int main(void) {
   facefeed = 0xfacefeed;
 
   new_frame(5);
+  check_intermediate_value(6);
+
+  take_two_args(return_value(), check_return_value());
 
   return 0;
 }
