@@ -2,52 +2,8 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
-
-// MARK: Asyncify
-
-#define ASYNCIFY_BUF_SIZE 128
-
-struct asyncify_buf {
-  void *top;
-  void *end;
-  uint8_t buffer[ASYNCIFY_BUF_SIZE];
-};
-
-void init_asyncify_buf(struct asyncify_buf* buf) {
-  buf->top = &buf->buffer[0];
-  buf->end = &buf->buffer[ASYNCIFY_BUF_SIZE];
-}
-__attribute__((import_module("asyncify"), import_name("start_unwind")))
-void asyncify_start_unwind(struct asyncify_buf *buf);
-__attribute__((import_module("asyncify"), import_name("stop_unwind")))
-void asyncify_stop_unwind(void);
-__attribute__((import_module("asyncify"), import_name("start_rewind")))
-void asyncify_start_rewind(struct asyncify_buf *buf);
-__attribute__((import_module("asyncify"), import_name("stop_rewind")))
-void asyncify_stop_rewind(void);
-
-// MARK: Helpers for CRuby
-
-typedef void (*rb_wasm_scan_func)(void*, void*);
-
-static struct asyncify_buf *active_asyncify_buf = NULL;
-
-void rb_wasm_scan_locals(rb_wasm_scan_func scan) {
-  static struct asyncify_buf buf;
-  static int spilling = 0;
-  if (!spilling) {
-    spilling = 1;
-    init_asyncify_buf(&buf);
-    active_asyncify_buf = &buf;
-    asyncify_start_unwind(&buf);
-  } else {
-    asyncify_stop_rewind();
-    spilling = 0;
-    active_asyncify_buf = NULL;
-    scan(buf.top, buf.end);
-  }
-}
-
+#include "rb-wasm-support/machine.h"
+#include "rb-wasm-support/asyncify.h"
 
 void dump_memory(uint8_t *base, uint8_t *end) {
   size_t chunk_size = 16;
@@ -132,10 +88,10 @@ int start(void) {
 // after please_gc
 int main(void) {
   int result = start();
-  while (active_asyncify_buf) {
+  while (rb_asyncify_get_active_buf()) {
     asyncify_stop_unwind();
     printf("stop the world\n");
-    asyncify_start_rewind(active_asyncify_buf);
+    asyncify_start_rewind(rb_asyncify_get_active_buf());
     result = start();
   }
   return result;
