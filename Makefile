@@ -13,21 +13,20 @@ ASYNCIFY_FLAGS = -g --pass-arg=asyncify-verbose --pass-arg=asyncify-ignore-impor
 
 LIBOBJS = try_catch.S.o machine.S.o machine.c.o
 
-TESTS = try_catch_test machine_test
+TESTS = tests/try_catch_test tests/machine_test.asyncified
 
 all: $(LIBOBJS)
 clean:
-	rm -rf $(LIBOBJS) $(TESTS) scan_by_asyncify_test.c.o machine_test.c.o
+	rm -rf $(LIBOBJS) $(TESTS) tests/try_catch_test.c.o tests/machine_test.c.o
 
-test: $(TESTS) run-tests.js
-	./run-tests.js $(TESTS)
+test: $(TESTS) bin/run-tests.js
+	./bin/run-tests.js $(TESTS)
 
-try_catch_test: try_catch_test.c.o $(LIBOBJS)
+tests/%: tests/%.c.o $(LIBOBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-machine_test: machine_test.c.o $(LIBOBJS)
-	$(CC) $(LDFLAGS) $^ -o $@
-	$(WASM_OPT) --asyncify $(ASYNCIFY_FLAGS) $@ -o $@
+tests/%.asyncified: tests/%
+	$(WASM_OPT) --asyncify $(ASYNCIFY_FLAGS) $^ -o $@
 
 %.S.o: %.S
 	$(MC) $(MCFLAGS) $< -o $@
