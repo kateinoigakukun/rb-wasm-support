@@ -2,7 +2,6 @@
 #define RB_WASM_SUPPORT_SETJMP_H
 
 #include "rb-wasm-support/config.h"
-#include "rb-wasm-support/machine.h"
 #include <stdbool.h>
 
 struct __rb_wasm_asyncify_jmp_buf {
