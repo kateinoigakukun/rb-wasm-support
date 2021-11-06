@@ -109,6 +109,8 @@ void check_stack_ptr(void) {
   printf("[%s] end\n", __func__);
 }
 
+// top level function should not be inlined to stop unwinding immediately after this function returns
+__attribute__((noinline))
 int start(void) {
   check_direct();
   check_jump_two_level();
