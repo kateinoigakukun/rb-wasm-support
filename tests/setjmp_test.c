@@ -106,9 +106,9 @@ int main(void) {
   int result;
   while (1) {
     result = start();
-    // NOTE: it's important to call 'asyncify_stop_rewind' here instead in rb_wasm_handle_jmp_unwind
+    // NOTE: it's important to call 'asyncify_stop_unwind' here instead in rb_wasm_handle_jmp_unwind
     // because unless that, Asyncify inserts another unwind check here and it unwinds to the root frame.
-    asyncify_stop_rewind();
+    asyncify_stop_unwind();
     if (!rb_wasm_handle_jmp_unwind()) {
       break;
     }
