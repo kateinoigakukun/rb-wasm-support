@@ -51,7 +51,7 @@ int _rb_wasm_setjmp(jmp_buf *env) {
   case JMP_BUF_STATE_RETURNING: {
     asyncify_stop_rewind();
     RB_WASM_DEBUG_LOG("[%s] JMP_BUF_STATE_RETURNING\n", __func__);
-    env->state = JMP_BUF_STATE_UNINITIALIZED;
+    env->state = JMP_BUF_STATE_CAPTURED;
     _rb_wasm_active_jmpbuf = NULL;
     return env->val;
   }
