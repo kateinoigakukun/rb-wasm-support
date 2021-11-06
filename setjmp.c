@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include "rb-wasm-support/asyncify.h"
+#include "rb-wasm-support/machine.h"
 #include "rb-wasm-support/setjmp.h"
 
 #ifdef RB_WASM_ENABLE_DEBUG_LOG
@@ -30,12 +31,13 @@ static jmp_buf *_rb_wasm_active_jmpbuf;
 
 __attribute__((noinline))
 int _rb_wasm_setjmp(jmp_buf *env) {
-  RB_WASM_DEBUG_LOG("[%s] env = %p, env->state = %d\n", __func__, env, env->state);
+  RB_WASM_DEBUG_LOG("[%s] env = %p, env->state = %d, sp = %p\n", __func__, env, env->state, rb_wasm_get_stack_pointer());
   switch (env->state) {
   case JMP_BUF_STATE_UNINITIALIZED: {
     RB_WASM_DEBUG_LOG("[%s] JMP_BUF_STATE_UNINITIALIZED\n", __func__);
     env->state = JMP_BUF_STATE_CAPTURING;
     env->val = 0;
+    env->sp = rb_wasm_get_stack_pointer();
     _rb_wasm_active_jmpbuf = env;
     async_buf_init(&env->setjmp_buf);
     asyncify_start_unwind(&env->setjmp_buf);
@@ -51,6 +53,7 @@ int _rb_wasm_setjmp(jmp_buf *env) {
   case JMP_BUF_STATE_RETURNING: {
     asyncify_stop_rewind();
     RB_WASM_DEBUG_LOG("[%s] JMP_BUF_STATE_RETURNING\n", __func__);
+    rb_wasm_set_stack_pointer(env->sp);
     env->state = JMP_BUF_STATE_CAPTURED;
     _rb_wasm_active_jmpbuf = NULL;
     return env->val;

@@ -1,7 +1,7 @@
 #ifndef RB_WASM_SUPPORT_SETJMP_H
 #define RB_WASM_SUPPORT_SETJMP_H
 
-#include "config.h"
+#include "rb-wasm-support/config.h"
 #include <stdbool.h>
 
 struct __rb_wasm_asyncify_jmp_buf {
@@ -14,6 +14,7 @@ typedef struct {
   struct __rb_wasm_asyncify_jmp_buf setjmp_buf;
   struct __rb_wasm_asyncify_jmp_buf longjmp_buf;
   void *dst_buf_top;
+  void *sp;
   int val;
   int state;
 } jmp_buf;

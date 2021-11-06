@@ -10,5 +10,7 @@ void rb_wasm_scan_locals(rb_wasm_scan_func scan);
 void _rb_wasm_scan_stack(rb_wasm_scan_func scan, void *current);
 /// defined in machine.S
 void *rb_wasm_get_stack_pointer(void);
+/// defined in machine.S
+void rb_wasm_set_stack_pointer(void *sp);
 
 #endif
