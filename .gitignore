@@ -2,3 +2,5 @@
 *.o
 *_test
 *_test.asyncified
+lib*.a
+/usr
