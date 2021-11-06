@@ -18,10 +18,6 @@ typedef struct {
   int state;
 } rb_wasm_jmp_buf;
 
-#define rb_wasm_init_jmp_buf(env) do { \
-    (env).state = 0;                   \
-  } while (0)
-
 /// defined in setjmp.S
 int _rb_wasm_setjmp(rb_wasm_jmp_buf *env);
 
