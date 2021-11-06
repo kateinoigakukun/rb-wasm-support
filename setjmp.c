@@ -30,14 +30,13 @@ void async_buf_init(struct __rb_wasm_asyncify_jmp_buf* buf) {
 static jmp_buf *_rb_wasm_active_jmpbuf;
 
 __attribute__((noinline))
-int _rb_wasm_setjmp(jmp_buf *env) {
-  RB_WASM_DEBUG_LOG("[%s] env = %p, env->state = %d, sp = %p, _rb_wasm_active_jmpbuf = %p\n", __func__, env, env->state, rb_wasm_get_stack_pointer(), _rb_wasm_active_jmpbuf);
+int _rb_wasm_setjmp_internal(jmp_buf *env) {
+  RB_WASM_DEBUG_LOG("[%s] env = %p, env->state = %d, _rb_wasm_active_jmpbuf = %p\n", __func__, env, env->state, _rb_wasm_active_jmpbuf);
   switch (env->state) {
   case JMP_BUF_STATE_UNINITIALIZED: {
     RB_WASM_DEBUG_LOG("[%s] JMP_BUF_STATE_UNINITIALIZED\n", __func__);
     env->state = JMP_BUF_STATE_CAPTURING;
     env->val = 0;
-    env->sp = rb_wasm_get_stack_pointer();
     _rb_wasm_active_jmpbuf = env;
     async_buf_init(&env->setjmp_buf);
     asyncify_start_unwind(&env->setjmp_buf);
@@ -53,8 +52,6 @@ int _rb_wasm_setjmp(jmp_buf *env) {
   case JMP_BUF_STATE_RETURNING: {
     asyncify_stop_rewind();
     RB_WASM_DEBUG_LOG("[%s] JMP_BUF_STATE_RETURNING\n", __func__);
-    RB_WASM_DEBUG_LOG("[%s] restoring sp = %p\n", __func__, env->sp);
-    rb_wasm_set_stack_pointer(env->sp);
     env->state = JMP_BUF_STATE_CAPTURED;
     _rb_wasm_active_jmpbuf = NULL;
     return env->val;

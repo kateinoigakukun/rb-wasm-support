@@ -19,6 +19,7 @@ void check_direct(void) {
     assert(0 && "unreachable after longjmp");
   } else {
     printf("[%s] rb_wasm_setjmp(buf) == %d\n", __func__, val);
+    printf("[%s] sp = %p\n", __func__, rb_wasm_get_stack_pointer());
     assert(val == 2 && "unexpected returned value");
   }
   printf("[%s] end\n", __func__);

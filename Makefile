@@ -11,7 +11,7 @@ CCFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -mexception-handling -Iinclude 
 LDFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -mexception-handling -Xlinker --stack-first -Xlinker -z -Xlinker stack-size=16777216
 ASYNCIFY_FLAGS = -g --pass-arg=asyncify-verbose --pass-arg=asyncify-ignore-imports --pass-arg=asyncify-ignore-indirect
 
-LIBOBJS = try_catch.S.o machine.S.o machine.c.o setjmp.c.o
+LIBOBJS = try_catch.S.o machine.S.o machine.c.o setjmp.c.o setjmp.S.o
 
 TESTS = tests/try_catch_test tests/machine_test.asyncified tests/setjmp_test.asyncified
 
