@@ -23,8 +23,46 @@ void check_direct(void) {
   printf("[%s] end\n", __func__);
 }
 
+void jump_to_dst(jmp_buf *dst) {
+  jmp_buf buf;
+  printf("[%s] start sp = %p\n", __func__, rb_wasm_get_stack_pointer());
+
+  rb_wasm_init_jmp_buf(buf);
+
+  printf("[%s] call rb_wasm_setjmp\n", __func__);
+  if (rb_wasm_setjmp(buf) == 0) {
+    printf("[%s] rb_wasm_setjmp(buf) == 0\n", __func__);
+    printf("[%s] call rb_wasm_longjmp(dst, 4)\n", __func__);
+    rb_wasm_longjmp(*dst, 4);
+    assert(0 && "unreachable after longjmp");
+  } else {
+    assert(0 && "unreachable");
+  }
+  printf("[%s] end\n", __func__);
+}
+
+void check_jump_two_level(void) {
+  jmp_buf buf;
+  int val;
+  printf("[%s] start\n", __func__);
+
+  rb_wasm_init_jmp_buf(buf);
+
+  printf("[%s] call rb_wasm_setjmp\n", __func__);
+  if ((val = rb_wasm_setjmp(buf)) == 0) {
+    printf("[%s] rb_wasm_setjmp(buf) == 0\n", __func__);
+    printf("[%s] call jump_to_dst(&buf)\n", __func__);
+    jump_to_dst(&buf);
+    assert(0 && "unreachable after longjmp");
+  } else {
+    printf("[%s] rb_wasm_setjmp(buf) == %d\n", __func__, val);
+    assert(val == 4 && "unexpected returned value");
+  }
+  printf("[%s] end\n", __func__);
+}
 int start(void) {
   check_direct();
+  check_jump_two_level();
   return 0;
 }
 
