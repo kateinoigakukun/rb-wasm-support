@@ -74,10 +74,10 @@ void _rb_wasm_longjmp(rb_wasm_jmp_buf* env, int value) {
   asyncify_start_unwind(&env->longjmp_buf);
 }
 
-bool rb_wasm_handle_jmp_unwind(void) {
+void *rb_wasm_handle_jmp_unwind(void) {
   RB_WASM_DEBUG_LOG("[%s] _rb_wasm_active_jmpbuf = %p\n", __func__, _rb_wasm_active_jmpbuf);
   if (!_rb_wasm_active_jmpbuf) {
-    return false;
+    return NULL;
   }
 
   switch (_rb_wasm_active_jmpbuf->state) {
@@ -94,6 +94,5 @@ bool rb_wasm_handle_jmp_unwind(void) {
   default:
     assert(0 && "unexpected state");
   }
-  asyncify_start_rewind(&_rb_wasm_active_jmpbuf->setjmp_buf);
-  return true;
+  return &_rb_wasm_active_jmpbuf->setjmp_buf;
 }

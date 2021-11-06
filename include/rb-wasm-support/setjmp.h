@@ -26,7 +26,7 @@ void _rb_wasm_longjmp(rb_wasm_jmp_buf *env, int val);
 #define rb_wasm_setjmp(env) ((env).state = 0, _rb_wasm_setjmp(&(env)))
 #define rb_wasm_longjmp(env, val) _rb_wasm_longjmp(&env, val)
 
-bool rb_wasm_handle_jmp_unwind(void);
+void *rb_wasm_handle_jmp_unwind(void);
 
 #ifdef RB_WASM_SUPPORT_EMULATE_SETJMP
 
