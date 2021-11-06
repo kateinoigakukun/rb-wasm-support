@@ -8,16 +8,16 @@ TARGET = wasm32-unknown-wasi
 OPTFLAGS =
 MCFLAGS = -triple=$(TARGET) -filetype=obj -mattr=+exception-handling
 CCFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -mexception-handling -Iinclude $(OPTFLAGS)
-LDFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -mexception-handling
-ASYNCIFY_FLAGS = -g --pass-arg=asyncify-verbose --pass-arg=asyncify-ignore-imports
+LDFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -mexception-handling -Xlinker --stack-first -Xlinker -z -Xlinker stack-size=16777216
+ASYNCIFY_FLAGS = -g --pass-arg=asyncify-verbose --pass-arg=asyncify-ignore-imports --pass-arg=asyncify-ignore-indirect
 
-LIBOBJS = try_catch.S.o machine.S.o machine.c.o
+LIBOBJS = try_catch.S.o machine.S.o machine.c.o setjmp.c.o
 
-TESTS = tests/try_catch_test tests/machine_test.asyncified
+TESTS = tests/try_catch_test tests/machine_test.asyncified tests/setjmp_test.asyncified
 
 all: $(LIBOBJS)
 clean:
-	rm -rf $(LIBOBJS) $(TESTS) tests/try_catch_test.c.o tests/machine_test.c.o
+	rm -rf $(LIBOBJS) $(TESTS) tests/try_catch_test.c.o tests/machine_test.c.o tests/setjmp_test.c.o
 
 test: $(TESTS) bin/run-tests.js
 	./bin/run-tests.js $(TESTS)

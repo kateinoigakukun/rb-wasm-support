@@ -47,6 +47,7 @@ void check_live(uint32_t target, const char *ctx) {
   if (find_in_stack(target, _rb_wasm_stack_mem[0], _rb_wasm_stack_mem[1])) {
     found_in_locals = true;
   }
+  // FIXME: `target` always appears in this call frame, so use parent call frame instead.
   rb_wasm_scan_stack(rb_wasm_mark_mem_range);
   if (find_in_stack(target, _rb_wasm_stack_mem[0], _rb_wasm_stack_mem[1])) {
     found_in_stack = true;

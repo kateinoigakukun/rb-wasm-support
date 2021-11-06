@@ -1,18 +1,17 @@
 #include <stdlib.h>
 #include "rb-wasm-support/machine.h"
 #include "rb-wasm-support/asyncify.h"
-
-#define ASYNCIFY_BUF_SIZE 2048
+#include "rb-wasm-support/config.h"
 
 struct asyncify_buf {
   void *top;
   void *end;
-  uint8_t buffer[ASYNCIFY_BUF_SIZE];
+  uint8_t buffer[RB_WASM_SUPPORT_FRAME_BUFFER_SIZE];
 };
 
 void init_asyncify_buf(struct asyncify_buf* buf) {
   buf->top = &buf->buffer[0];
-  buf->end = &buf->buffer[ASYNCIFY_BUF_SIZE];
+  buf->end = &buf->buffer[RB_WASM_SUPPORT_FRAME_BUFFER_SIZE];
 }
 
 void rb_wasm_scan_locals(rb_wasm_scan_func scan) {
