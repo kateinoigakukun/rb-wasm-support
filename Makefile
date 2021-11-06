@@ -33,7 +33,9 @@ clean:
 
 install: all
 	mkdir -p $(PREFIX)/lib
+	rm -rf $(PREFIX)/lib/$(LIB_A)
 	$(INSTALL) $(LIB_A) $(PREFIX)/lib
+	rm -rf $(PREFIX)/include/rb-wasm-support
 	mkdir -p $(PREFIX)/include/rb-wasm-support
 	$(INSTALL) $(HEADERS) $(PREFIX)/include/rb-wasm-support
 
