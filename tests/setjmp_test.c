@@ -5,12 +5,9 @@
 #include <assert.h>
 
 void check_direct(void) {
-  jmp_buf buf;
+  rb_wasm_jmp_buf buf;
   int val;
   printf("[%s] start\n", __func__);
-
-  rb_wasm_init_jmp_buf(buf);
-
   printf("[%s] call rb_wasm_setjmp\n", __func__);
   if ((val = rb_wasm_setjmp(buf)) == 0) {
     printf("[%s] rb_wasm_setjmp(buf) == 0\n", __func__);
@@ -25,12 +22,9 @@ void check_direct(void) {
   printf("[%s] end\n", __func__);
 }
 
-void jump_to_dst(jmp_buf *dst) {
-  jmp_buf buf;
+void jump_to_dst(rb_wasm_jmp_buf *dst) {
+  rb_wasm_jmp_buf buf;
   printf("[%s] start sp = %p\n", __func__, rb_wasm_get_stack_pointer());
-
-  rb_wasm_init_jmp_buf(buf);
-
   printf("[%s] call rb_wasm_setjmp\n", __func__);
   if (rb_wasm_setjmp(buf) == 0) {
     printf("[%s] rb_wasm_setjmp(buf) == 0\n", __func__);
@@ -44,12 +38,9 @@ void jump_to_dst(jmp_buf *dst) {
 }
 
 void check_jump_two_level(void) {
-  jmp_buf buf;
+  rb_wasm_jmp_buf buf;
   int val;
   printf("[%s] start\n", __func__);
-
-  rb_wasm_init_jmp_buf(buf);
-
   printf("[%s] call rb_wasm_setjmp\n", __func__);
   if ((val = rb_wasm_setjmp(buf)) == 0) {
     printf("[%s] rb_wasm_setjmp(buf) == 0\n", __func__);
@@ -64,12 +55,9 @@ void check_jump_two_level(void) {
 }
 
 void check_reuse(void) {
-  jmp_buf buf;
+  rb_wasm_jmp_buf buf;
   int val;
   printf("[%s] start\n", __func__);
-
-  rb_wasm_init_jmp_buf(buf);
-
   printf("[%s] call rb_wasm_setjmp\n", __func__);
   if ((val = rb_wasm_setjmp(buf)) == 0) {
     printf("[%s] rb_wasm_setjmp(buf) == 0\n", __func__);
@@ -88,13 +76,10 @@ void check_reuse(void) {
 
 void check_stack_ptr(void) {
   static void *normal_sp;
-  jmp_buf buf;
+  rb_wasm_jmp_buf buf;
   normal_sp = rb_wasm_get_stack_pointer();
 
   printf("[%s] start sp = %p\n", __func__, normal_sp);
-
-  rb_wasm_init_jmp_buf(buf);
-
   printf("[%s] call rb_wasm_setjmp\n", __func__);
   if (rb_wasm_setjmp(buf) == 0) {
     printf("[%s] call jump_to_dst(&buf)\n", __func__);

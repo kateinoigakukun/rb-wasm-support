@@ -13,7 +13,7 @@
 # define RB_WASM_DEBUG_LOG(...)
 #endif
 
-enum jmp_buf_state {
+enum rb_wasm_jmp_buf_state {
   JMP_BUF_STATE_UNINITIALIZED = 0,
   JMP_BUF_STATE_CAPTURING     = 1,
   JMP_BUF_STATE_CAPTURED      = 2,
@@ -27,10 +27,10 @@ void async_buf_init(struct __rb_wasm_asyncify_jmp_buf* buf) {
   buf->end = &buf->buffer[RB_WASM_SUPPORT_FRAME_BUFFER_SIZE];
 }
 
-static jmp_buf *_rb_wasm_active_jmpbuf;
+static rb_wasm_jmp_buf *_rb_wasm_active_jmpbuf;
 
 __attribute__((noinline))
-int _rb_wasm_setjmp_internal(jmp_buf *env) {
+int _rb_wasm_setjmp_internal(rb_wasm_jmp_buf *env) {
   RB_WASM_DEBUG_LOG("[%s] env = %p, env->state = %d, _rb_wasm_active_jmpbuf = %p\n", __func__, env, env->state, _rb_wasm_active_jmpbuf);
   switch (env->state) {
   case JMP_BUF_STATE_UNINITIALIZED: {
@@ -63,7 +63,7 @@ int _rb_wasm_setjmp_internal(jmp_buf *env) {
 }
 
 __attribute__((noinline))
-void _rb_wasm_longjmp(jmp_buf* env, int value) {
+void _rb_wasm_longjmp(rb_wasm_jmp_buf* env, int value) {
   RB_WASM_DEBUG_LOG("[%s] env = %p, env->state = %d, value = %d\n", __func__, env, env->state, value);
   assert(env->state == JMP_BUF_STATE_CAPTURED);
   assert(value != 0);

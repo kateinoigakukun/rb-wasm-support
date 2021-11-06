@@ -16,20 +16,29 @@ typedef struct {
   void *dst_buf_top;
   int val;
   int state;
-} jmp_buf;
+} rb_wasm_jmp_buf;
 
 #define rb_wasm_init_jmp_buf(env) do { \
     (env).state = 0;                   \
   } while (0)
 
 /// defined in setjmp.S
-int _rb_wasm_setjmp(jmp_buf *env);
+int _rb_wasm_setjmp(rb_wasm_jmp_buf *env);
 
-void _rb_wasm_longjmp(jmp_buf *env, int val);
+void _rb_wasm_longjmp(rb_wasm_jmp_buf *env, int val);
 
-#define rb_wasm_setjmp(env) _rb_wasm_setjmp(&env)
+#define rb_wasm_setjmp(env) ((env).state = 0, _rb_wasm_setjmp(&(env)))
 #define rb_wasm_longjmp(env, val) _rb_wasm_longjmp(&env, val)
 
 bool rb_wasm_handle_jmp_unwind(void);
+
+#ifdef RB_WASM_SUPPORT_EMULATE_SETJMP
+
+typedef rb_wasm_jmp_buf jmp_buf;
+
+#define setjmp(env) rb_wasm_setjmp(env)
+#define longjmp(env, val) rb_wasm_longjmp(env, val)
+
+#endif
 
 #endif
