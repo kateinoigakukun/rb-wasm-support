@@ -6,16 +6,21 @@
 void check_direct(void) {
   jmp_buf buf;
   int val;
+  printf("[%s] start\n", __func__);
+
   rb_wasm_init_jmp_buf(buf);
 
-  if ((val = _rb_wasm_setjmp(&buf)) == 0) {
-    printf("after setjmp\n");
+  printf("[%s] call rb_wasm_setjmp\n", __func__);
+  if ((val = rb_wasm_setjmp(buf)) == 0) {
+    printf("[%s] rb_wasm_setjmp(buf) == 0\n", __func__);
+    printf("[%s] call rb_wasm_longjmp(buf, 2)\n", __func__);
     rb_wasm_longjmp(buf, 2);
     assert(0 && "unreachable after longjmp");
   } else {
-    printf("setjmp returns %d\n", val);
+    printf("[%s] rb_wasm_setjmp(buf) == %d\n", __func__, val);
     assert(val == 2 && "unexpected returned value");
   }
+  printf("[%s] end\n", __func__);
 }
 
 int start(void) {
