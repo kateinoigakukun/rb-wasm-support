@@ -40,17 +40,21 @@ void rb_wasm_mark_mem_range(void *start, void *end) {
   _rb_wasm_stack_mem[0] = start;
   _rb_wasm_stack_mem[1] = end;
 }
-void check_live(uint32_t target, const char *ctx) {
+
+#define check_live(target, ctx) do {            \
+    rb_wasm_scan_stack(rb_wasm_mark_mem_range); \
+    _check_live(target, ctx);                   \
+  } while (0);
+
+void _check_live(uint32_t target, const char *ctx) {
   printf("checking %#x ... ", target);
-  rb_wasm_scan_locals(rb_wasm_mark_mem_range);
   bool found_in_locals = false, found_in_stack = false;
   if (find_in_stack(target, _rb_wasm_stack_mem[0], _rb_wasm_stack_mem[1])) {
-    found_in_locals = true;
-  }
-  // FIXME: `target` always appears in this call frame, so use parent call frame instead.
-  rb_wasm_scan_stack(rb_wasm_mark_mem_range);
-  if (find_in_stack(target, _rb_wasm_stack_mem[0], _rb_wasm_stack_mem[1])) {
     found_in_stack = true;
+  }
+  rb_wasm_scan_locals(rb_wasm_mark_mem_range);
+  if (find_in_stack(target, _rb_wasm_stack_mem[0], _rb_wasm_stack_mem[1])) {
+    found_in_locals = true;
   }
   if (found_in_locals && found_in_stack) {
     printf("ok (found in C stack and Wasm locals)\n");
