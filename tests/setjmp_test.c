@@ -104,12 +104,14 @@ int start(void) {
 
 int main(void) {
   int result;
+  rb_wasm_jmp_buf *buf;
   while (1) {
     result = start();
     // NOTE: it's important to call 'asyncify_stop_unwind' here instead in rb_wasm_handle_jmp_unwind
     // because unless that, Asyncify inserts another unwind check here and it unwinds to the root frame.
     asyncify_stop_unwind();
-    if (!rb_wasm_handle_jmp_unwind()) {
+    if ((buf = rb_wasm_handle_jmp_unwind())) {
+      asyncify_start_rewind(buf);
       break;
     }
   }
