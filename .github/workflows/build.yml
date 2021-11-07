@@ -1,0 +1,25 @@
+name: Build
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          mkdir ./tools
+          cd ./tools
+          curl -LO https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang+llvm-12.0.0-x86_64-apple-darwin.tar.xz
+          tar xfz clang+llvm-12.0.0-x86_64-apple-darwin.tar.xz
+          curl -LO https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-12/wasi-sdk-12.0-macos.tar.gz
+          tar xfz wasi-sdk-12.0-macos.tar.gz
+
+      - run: |
+          make install PREFIX=./rb-wasm-support-wasm32-unknown-wasi
+          tar cfz rb-wasm-support-wasm32-unknown-wasi.tar.gz rb-wasm-support-wasm32-unknown-wasi
+      - uses: actions/upload-artifact@v2
+        with:
+          name: rb-wasm-support-wasm32-unknown-wasi
+          path: ./rb-wasm-support-wasm32-unknown-wasi.tar.gz
+
