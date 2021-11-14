@@ -17,7 +17,7 @@ ARFLAGS = rcD
 ASYNCIFY_FLAGS = -g --pass-arg=asyncify-verbose --pass-arg=asyncify-ignore-imports --pass-arg=asyncify-ignore-indirect
 
 header_dir = ./include/rb-wasm-support
-LIBOBJS = try_catch.S.o machine.S.o machine.c.o setjmp.c.o setjmp.S.o
+LIBOBJS = machine.S.o machine.c.o setjmp.c.o setjmp.S.o
 HEADERS = $(header_dir)/asyncify.h \
 	  $(header_dir)/config.h \
 	  $(header_dir)/machine.h \
@@ -25,7 +25,7 @@ HEADERS = $(header_dir)/asyncify.h \
 
 LIB_A = librb_wasm_support.a
 
-TESTS = tests/try_catch_test tests/machine_test.asyncified tests/setjmp_test.asyncified
+TESTS = tests/machine_test.asyncified tests/setjmp_test.asyncified
 
 all: $(LIBOBJS) $(LIB_A)
 clean:
