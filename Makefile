@@ -1,4 +1,4 @@
-MC = ./tools/clang+llvm-12.0.0-x86_64-apple-darwin/bin/llvm-mc
+MC = ./tools/wasi-sdk-12.0/bin/clang -c
 CC = ./tools/wasi-sdk-12.0/bin/clang
 AR = ./tools/wasi-sdk-12.0/bin/llvm-ar
 INSTALL = /usr/bin/install
@@ -10,22 +10,23 @@ SYSROOT = ./tools/wasi-sdk-12.0/share/wasi-sysroot/
 TARGET = wasm32-unknown-wasi
 
 OPTFLAGS =
-MCFLAGS = -triple=$(TARGET) -filetype=obj -mattr=+exception-handling
-CCFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -mexception-handling -Iinclude $(OPTFLAGS)
-LDFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -mexception-handling -Xlinker --stack-first -Xlinker -z -Xlinker stack-size=16777216
+MCFLAGS = -target $(TARGET)
+CCFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -Iinclude $(OPTFLAGS)
+LDFLAGS = -target $(TARGET) --sysroot $(SYSROOT) -Xlinker --stack-first -Xlinker -z -Xlinker stack-size=16777216
 ARFLAGS = rcD
 ASYNCIFY_FLAGS = -g --pass-arg=asyncify-verbose --pass-arg=asyncify-ignore-imports --pass-arg=asyncify-ignore-indirect
 
 header_dir = ./include/rb-wasm-support
-LIBOBJS = machine.S.o machine.c.o setjmp.c.o setjmp.S.o
+LIBOBJS = machine.S.o machine.c.o setjmp.c.o setjmp.S.o fiber.c.o
 HEADERS = $(header_dir)/asyncify.h \
 	  $(header_dir)/config.h \
 	  $(header_dir)/machine.h \
-	  $(header_dir)/setjmp.h
+	  $(header_dir)/setjmp.h \
+	  $(header_dir)/fiber.h
 
 LIB_A = librb_wasm_support.a
 
-TESTS = tests/machine_test.asyncified tests/setjmp_test.asyncified
+TESTS = tests/machine_test.asyncified tests/setjmp_test.asyncified tests/fiber_test.asyncified
 
 all: $(LIBOBJS) $(LIB_A)
 clean:
