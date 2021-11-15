@@ -41,7 +41,6 @@ void *rb_wasm_handle_fiber_unwind(void (**new_fiber_entry)(void *, void *),
                                   void **arg0, void **arg1) {
   rb_wasm_fiber_context *next_fiber;
   if (!_rb_wasm_active_next_fiber) {
-    *new_fiber_entry = NULL;
     RB_WASM_DEBUG_LOG("[%s] no next fiber\n", __func__);
     return NULL;
   }

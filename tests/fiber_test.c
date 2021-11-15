@@ -35,9 +35,8 @@ static void func2(void *arg0, void *arg1) {
 
 // top level function should not be inlined to stop unwinding immediately after this function returns
 __attribute__((noinline))
-void start(void *arg0, void *arg1) {
+int start() {
   rb_wasm_init_context(&fctx_main);
-  rb_wasm_makecontext(&fctx_main, start, arg0, arg1);
   fctx_main.is_started = true;
 
   rb_wasm_init_context(&fctx_func1);
@@ -47,37 +46,44 @@ void start(void *arg0, void *arg1) {
   rb_wasm_makecontext(&fctx_func2, func2, 0, 0);
 
   counter++;
-  fprintf(stderr, "main: swapcontext(&uctx_main, &fctx_func2)\n");
+  fprintf(stderr, "start: swapcontext(&uctx_main, &fctx_func2)\n");
   rb_wasm_swapcontext(&fctx_main, &fctx_func2);
   assert(counter == 4);
 
-  fprintf(stderr, "main: exiting\n");
-  exit(EXIT_SUCCESS);
+  fprintf(stderr, "start: exiting\n");
+  return 42;
 }
 
 int main(void) {
   void *buf;
   bool new_fiber_started;
-  void (*entry_point)(void *, void *) = start;
+  void (*fiber_entry_point)(void *, void *) = NULL;
   void (*old_entry_point)(void *, void *);
   void *arg0 = NULL, *arg1 = NULL;
+  int result;
 
   while (1) {
-    entry_point(arg0, arg1);
+    if (fiber_entry_point) {
+      fiber_entry_point(arg0, arg1);
+    } else {
+      result = start();
+    }
     // NOTE: it's important to call 'asyncify_stop_unwind' here instead in rb_wasm_handle_jmp_unwind
     // because unless that, Asyncify inserts another unwind check here and it unwinds to the root frame.
     asyncify_stop_unwind();
-    old_entry_point = entry_point;
-    buf = rb_wasm_handle_fiber_unwind(&entry_point, &arg0, &arg1);
+    old_entry_point = fiber_entry_point;
+    buf = rb_wasm_handle_fiber_unwind(&fiber_entry_point, &arg0, &arg1);
     if (buf) {
       fprintf(stderr, "asyncify_start_rewind\n");
       asyncify_start_rewind(buf);
       continue;
-    } else if (entry_point != NULL && old_entry_point != entry_point) {
+    } else if (old_entry_point != fiber_entry_point) {
       fprintf(stderr, "new_fiber_started\n");
       continue;
     }
     break;
   }
+  assert(result == 42);
+  fprintf(stderr, "main: exiting\n");
   return 0;
 }

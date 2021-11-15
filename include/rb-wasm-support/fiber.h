@@ -11,7 +11,7 @@ struct __rb_wasm_asyncify_fiber_ctx {
 };
 
 typedef struct {
-  /// null if the entry point has been already started
+  /// null if the entry point is main
   void (*entry_point)(void *, void *);
   void *arg0, *arg1;
   struct __rb_wasm_asyncify_fiber_ctx asyncify_buf;
