@@ -7,7 +7,8 @@ jobs:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      - run: |
+      - name: Install wasi-sdk
+        run: |
           mkdir ./tools
           cd ./tools
           curl -LO https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-12/wasi-sdk-12.0-macos.tar.gz
@@ -20,4 +21,6 @@ jobs:
         with:
           name: rb-wasm-support-wasm32-unknown-wasi
           path: ./rb-wasm-support-wasm32-unknown-wasi.tar.gz
-
+      - name: Install Binaryen
+        run: brew install binaryen
+      - run: make test
