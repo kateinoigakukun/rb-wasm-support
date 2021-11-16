@@ -26,6 +26,6 @@ void rb_wasm_makecontext(rb_wasm_fiber_context *fcp, void (*func)(void *, void *
 void rb_wasm_swapcontext(rb_wasm_fiber_context *ofcp, rb_wasm_fiber_context *fcp);
 
 void *rb_wasm_handle_fiber_unwind(void (**new_fiber_entry)(void *, void *), 
-                                  void **arg0, void **arg1);
+                                  void **arg0, void **arg1, bool *is_new_fiber_started);
 
 #endif

@@ -38,10 +38,11 @@ void rb_wasm_swapcontext(rb_wasm_fiber_context *ofcp, rb_wasm_fiber_context *fcp
 }
 
 void *rb_wasm_handle_fiber_unwind(void (**new_fiber_entry)(void *, void *), 
-                                  void **arg0, void **arg1) {
+                                  void **arg0, void **arg1, bool *is_new_fiber_started) {
   rb_wasm_fiber_context *next_fiber;
   if (!_rb_wasm_active_next_fiber) {
     RB_WASM_DEBUG_LOG("[%s] no next fiber\n", __func__);
+    *is_new_fiber_started = false;
     return NULL;
   }
 
@@ -57,11 +58,13 @@ void *rb_wasm_handle_fiber_unwind(void (**new_fiber_entry)(void *, void *),
     RB_WASM_DEBUG_LOG("[%s] new fiber started\n", __func__);
     // start a new fiber if not started yet
     next_fiber->is_started = true;
+    *is_new_fiber_started = true;
     return NULL;
   } else {
     RB_WASM_DEBUG_LOG("[%s] resume a fiber\n", __func__);
     // resume a fiber again
     next_fiber->is_rewinding = true;
+    *is_new_fiber_started = false;
     return &next_fiber->asyncify_buf;
   }
 }
